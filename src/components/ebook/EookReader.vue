@@ -19,7 +19,7 @@
             }
         },
         mounted() {
-            const fileName = this.$route.params.fileName.split("|").join("/")
+            const fileName = this.$route.params.fileName.split("|").join("/");
             this.setFileName(fileName).then(() => {
                     this.initEpub();
                 }
@@ -50,11 +50,31 @@
                 this.setMenuVisible(false);
                 this.setSettingVisible(-1);
             },
+            initFontFamily() {
+                let cachedFontFamily = getFontFamily(this.fileName);
+                if (!cachedFontFamily) {
+                    cachedFontFamily = 'Times New Roman';
+                    saveFontFamily(this.fileName, cachedFontFamily)
+                } else {
+                    this.setDefaultFontFamily(cachedFontFamily);
+                    this.book.rendition.themes.font(cachedFontFamily)
+                }
+            },
+            initFontSize() {
+                let cachedFontSize = getFontSize(this.fileName);
+                if (!cachedFontSize) {
+                    cachedFontSize = this.fontSizeList[(this.fontSizeList.length - 1) / 2 - 1].fontSize;
+                    saveFontSize(this.fileName, cachedFontSize)
+                } else {
+                    this.setDefaultFontSize(cachedFontSize);
+                    this.book.rendition.themes.fontSize(cachedFontSize)
+                }
+            },
             initEpub() {
-                const url = "http://localhost:8081/epub/" + this.fileName + ".epub";
+                const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + ".epub";
                 //   console.log(url);
                 this.book = new Epub(url);
-                this.setCurrentBook(this.book)
+                this.setCurrentBook(this.book);
                 this.renditon = this.book.renderTo("read", {
                     width: innerWidth,
                     height: innerHeight,
@@ -62,25 +82,10 @@
                 });
 
                 this.renditon.display().then(() => {
-                    let cachedFontFamily = getFontFamily(this.fileName)
-                    if (!cachedFontFamily) {
-                        cachedFontFamily = 'Times New Roman'
-                        saveFontFamily(this.fileName, cachedFontFamily)
-                    } else {
-                        this.setDefaultFontFamily(cachedFontFamily)
-                        this.book.rendition.themes.font(cachedFontFamily)
-                    }
+                    this.initFontFamily();
+                    this.initFontSize();
+                });
 
-                    let cachedFontSize = getFontSize(this.fileName)
-                    if (!cachedFontSize) {
-                        cachedFontSize = this.fontSizeList[(this.fontSizeList.length - 1) / 2].fontSize
-                        saveFontSize(this.fileName, cachedFontSize)
-                    } else {
-                        this.setDefaultFontSize(cachedFontSize)
-                        this.book.rendition.themes.fontSize(cachedFontSize)
-                    }
-
-                })
                 this.renditon.on("touchstart", event => {
                     this.touchStartX = event.changedTouches[0].clientX;
                     this.touchStartTime = event.timeStamp;
@@ -98,7 +103,8 @@
                     }
                     event.preventDefault();
                     event.stopPropagation();
-                })
+                });
+
                 this.renditon.hooks.content.register(contents => {
                     Promise.all([
                         contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),

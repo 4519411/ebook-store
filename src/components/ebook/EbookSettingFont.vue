@@ -43,7 +43,7 @@
         },
         methods: {
             setFontSize(fontSize) {
-                this.setDefaultFontSize(fontSize)
+                this.setDefaultFontSize(fontSize);
                 if (this.currentBook.rendition) {
                     this.currentBook.rendition.themes.fontSize(fontSize)
                 }

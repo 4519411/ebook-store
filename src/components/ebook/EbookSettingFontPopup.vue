@@ -5,7 +5,7 @@
         <div class="ebook-popup-title-icon" @click="hide">
           <span class="icon-down2"></span>
         </div>
-        <div class="ebook-popup-title-text">选择字体</div>
+        <div class="ebook-popup-title-text">{{$t('book.selectFont')}}</div>
       </div>
       <div class="ebook-popup-list-warpper">
         <div class="ebook-popup-item" v-for="(item, index) in fontFamilyList" :key="index"
@@ -40,7 +40,7 @@
                 return this.defaultFontFamily === item.font;
             },
             setFontFamily(font) {
-                this.setDefaultFontFamily(font)
+                this.setDefaultFontFamily(font);
                 if (font === 'Default') {
                     this.currentBook.rendition.themes.font('Times New Roman')
                 } else {
