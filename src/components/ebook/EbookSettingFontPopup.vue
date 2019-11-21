@@ -23,7 +23,7 @@
 <script>
     import {ebookMixin} from '../../utils/mixin'
     import {FONT_FAMILY} from '../../utils/book'
-    import {getBookFontFamily, setBookFontFamily} from "../../utils/localStorage";
+    import {saveFontFamily} from "../../utils/localStorage";
 
     export default {
         mixins: [ebookMixin],
@@ -46,9 +46,7 @@
                 } else {
                     this.currentBook.rendition.themes.font(font)
                 }
-                console.log(font)
-                setBookFontFamily(this.fileName, font)
-                console.log(getBookFontFamily(this.fileName))
+                saveFontFamily(this.fileName, font)
             }
         }
     };

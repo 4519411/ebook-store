@@ -5,17 +5,21 @@
 </template>
 
 <script>
+    import {FONT_SIZE_LIST} from '../../utils/book'
     import {ebookMixin} from "../../utils/mixin"
     import Epub from "epubjs"
-    import {setBookFontFamily, getBookFontFamily} from "../../utils/localStorage"
+    import {saveFontFamily, getFontFamily, saveFontSize, getFontSize} from "../../utils/localStorage"
 
     global.ePub = Epub;
     export default {
         mixins: [ebookMixin],
+        data() {
+            return {
+                fontSizeList: FONT_SIZE_LIST
+            }
+        },
         mounted() {
             const fileName = this.$route.params.fileName.split("|").join("/")
-            // console.log(fileName)
-            // console.log(this)
             this.setFileName(fileName).then(() => {
                     this.initEpub();
                 }
@@ -58,11 +62,24 @@
                 });
 
                 this.renditon.display().then(() => {
-                    let cachedFileName = getBookFontFamily(this.fileName)
-                    if (!cachedFileName) {
-                        setBookFontFamily(this.fileName, this.defaultFontFamily)
+                    let cachedFontFamily = getFontFamily(this.fileName)
+                    if (!cachedFontFamily) {
+                        cachedFontFamily = 'Times New Roman'
+                        saveFontFamily(this.fileName, cachedFontFamily)
+                    } else {
+                        this.setDefaultFontFamily(cachedFontFamily)
+                        this.book.rendition.themes.font(cachedFontFamily)
                     }
-                    this.book.rendition.themes.font(cachedFileName)
+
+                    let cachedFontSize = getFontSize(this.fileName)
+                    if (!cachedFontSize) {
+                        cachedFontSize = this.fontSizeList[(this.fontSizeList.length - 1) / 2].fontSize
+                        saveFontSize(this.fileName, cachedFontSize)
+                    } else {
+                        this.setDefaultFontSize(cachedFontSize)
+                        this.book.rendition.themes.fontSize(cachedFontSize)
+                    }
+
                 })
                 this.renditon.on("touchstart", event => {
                     this.touchStartX = event.changedTouches[0].clientX;
