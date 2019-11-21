@@ -5,12 +5,22 @@
 </template>
 
 <script>
-    import {ebookMixin} from "../../utils/mixin";
-    import Epub from "epubjs";
+    import {ebookMixin} from "../../utils/mixin"
+    import Epub from "epubjs"
+    import {setBookFontFamily, getBookFontFamily} from "../../utils/localStorage"
 
     global.ePub = Epub;
     export default {
         mixins: [ebookMixin],
+        mounted() {
+            const fileName = this.$route.params.fileName.split("|").join("/")
+            // console.log(fileName)
+            // console.log(this)
+            this.setFileName(fileName).then(() => {
+                    this.initEpub();
+                }
+            );
+        },
         methods: {
             prevPage() {
                 if (this.renditon) {
@@ -47,7 +57,13 @@
                     method: "default"
                 });
 
-                this.renditon.display();
+                this.renditon.display().then(() => {
+                    let cachedFileName = getBookFontFamily(this.fileName)
+                    if (!cachedFileName) {
+                        setBookFontFamily(this.fileName, this.defaultFontFamily)
+                    }
+                    this.book.rendition.themes.font(cachedFileName)
+                })
                 this.renditon.on("touchstart", event => {
                     this.touchStartX = event.changedTouches[0].clientX;
                     this.touchStartTime = event.timeStamp;
@@ -73,17 +89,10 @@
                         contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`),
                         contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`)
                     ]).then(() => {
-                        console.log('字体加载完毕')
+                        // console.log('字体加载完毕')
                     })
                 })
             }
-        },
-        mounted() {
-            this.setFileName(this.$route.params.fileName.split("|").join("/")).then(
-                () => {
-                    this.initEpub();
-                }
-            );
         }
     };
 </script>
