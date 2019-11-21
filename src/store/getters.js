@@ -18,6 +18,6 @@ const book = {
     pagelist: state => state.book.pagelist,
     offsetY: state => state.book.offsetY,
     isBookmark: state => state.book.isBookmark
-}
+};
 
 export default book

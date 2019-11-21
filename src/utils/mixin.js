@@ -1,4 +1,5 @@
 import {mapGetters, mapActions} from 'vuex'
+import {themeList, addCSS, removeCSSAll} from "./book"
 
 export const ebookMixin = {
   computed: {
@@ -22,7 +23,10 @@ export const ebookMixin = {
       'pagelist',
       'offsetY',
       'isBookmark'
-    ])
+    ]),
+    themeList() {
+      return themeList(this)
+    }
   },
   methods: {
     ...mapActions([
@@ -45,6 +49,11 @@ export const ebookMixin = {
       'setPagelist',
       'setOffsetY',
       'setIsBookmark'
-    ])
-  },
-}
+    ]),
+    initGlobalStyle(theme) {
+      removeCSSAll();
+      const href = `${process.env.VUE_APP_RES_URL}/theme/theme_` + theme.toLowerCase() + ".css";
+      addCSS(href)
+    }
+  }
+};

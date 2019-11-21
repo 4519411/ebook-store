@@ -5,7 +5,7 @@
         <div class="ebook-popup-title-icon" @click="hide">
           <span class="icon-down2"></span>
         </div>
-        <div class="ebook-popup-title-text">{{$t('book.selectFont')}}</div>
+        <div class="ebook-popup-title-text">{{ $t('book.selectFont') }}</div>
       </div>
       <div class="ebook-popup-list-warpper">
         <div class="ebook-popup-item" v-for="(item, index) in fontFamilyList" :key="index"
@@ -21,9 +21,9 @@
 </template>
 
 <script>
-    import {ebookMixin} from '../../utils/mixin'
-    import {FONT_FAMILY} from '../../utils/book'
-    import {saveFontFamily} from "../../utils/localStorage";
+    import {ebookMixin} from "../../utils/mixin"
+    import {FONT_FAMILY} from "../../utils/book"
+    import {saveFontFamily} from "../../utils/localStorage"
 
     export default {
         mixins: [ebookMixin],

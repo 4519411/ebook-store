@@ -5,10 +5,17 @@
 </template>
 
 <script>
-    import {FONT_SIZE_LIST} from '../../utils/book'
-    import {ebookMixin} from "../../utils/mixin"
-    import Epub from "epubjs"
-    import {saveFontFamily, getFontFamily, saveFontSize, getFontSize} from "../../utils/localStorage"
+    import {FONT_SIZE_LIST} from "../../utils/book";
+    import {ebookMixin} from "../../utils/mixin";
+    import Epub from "epubjs";
+    import {
+        saveFontFamily,
+        getFontFamily,
+        saveFontSize,
+        getFontSize,
+        getTheme,
+        saveTheme
+    } from "../../utils/localStorage"
 
     global.ePub = Epub;
     export default {
@@ -53,8 +60,7 @@
             initFontFamily() {
                 let cachedFontFamily = getFontFamily(this.fileName);
                 if (!cachedFontFamily) {
-                    cachedFontFamily = 'Times New Roman';
-                    saveFontFamily(this.fileName, cachedFontFamily)
+                    saveFontFamily(this.fileName, this.defaultFontFamily)
                 } else {
                     this.setDefaultFontFamily(cachedFontFamily);
                     this.book.rendition.themes.font(cachedFontFamily)
@@ -63,12 +69,23 @@
             initFontSize() {
                 let cachedFontSize = getFontSize(this.fileName);
                 if (!cachedFontSize) {
-                    cachedFontSize = this.fontSizeList[(this.fontSizeList.length - 1) / 2 - 1].fontSize;
-                    saveFontSize(this.fileName, cachedFontSize)
+                    saveFontSize(this.fileName, this.defaultFontSize)
                 } else {
                     this.setDefaultFontSize(cachedFontSize);
                     this.book.rendition.themes.fontSize(cachedFontSize)
                 }
+            },
+            initTheme() {
+                this.themeList.forEach(theme => {
+                    this.renditon.themes.register(theme.name, theme.style)
+                });
+                let cachedTheme = getTheme(this.fileName);
+                if (!cachedTheme) {
+                    cachedTheme = this.themeList[0].name;
+                    this.setDefaultTheme(cachedTheme);
+                    saveTheme(this.fileName, cachedTheme)
+                }
+                this.book.rendition.themes.select(cachedTheme)
             },
             initEpub() {
                 const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + ".epub";
@@ -82,8 +99,10 @@
                 });
 
                 this.renditon.display().then(() => {
+                    this.initTheme();
                     this.initFontFamily();
                     this.initFontSize();
+                    this.initGlobalStyle(getTheme(this.fileName));
                 });
 
                 this.renditon.on("touchstart", event => {

@@ -1,6 +1,6 @@
 import Storage from 'web-storage-cache'
 
-const localStorage = new Storage()
+const localStorage = new Storage();
 
 export function setLocalStorage(key, value) {
   return localStorage.set(key, value)
@@ -19,16 +19,16 @@ export function clearLocalStorage() {
 }
 
 export function setBookObject(fileName, key, value) {
-  let book = getLocalStorage(`${fileName}-info`)
+  let book = getLocalStorage(`${fileName}-info`);
   if (!book) {
     book = {}
   }
-  book[key] = value
+  book[key] = value;
   setLocalStorage(`${fileName}-info`, book)
 }
 
 export function getBookObject(fileName, key) {
-  let book = getLocalStorage(`${fileName}-info`)
+  let book = getLocalStorage(`${fileName}-info`);
   if (book) {
     return book[key]
   } else {

@@ -79,6 +79,6 @@ const book = {
           state.isBookmark = isBookmark
         }
     }
-}
+};
 
 export default book
