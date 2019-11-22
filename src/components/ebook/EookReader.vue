@@ -57,6 +57,51 @@
                 this.setMenuVisible(false);
                 this.setSettingVisible(-1);
             },
+            initRendition() {
+                this.renditon = this.book.renderTo("read", {
+                    width: innerWidth,
+                    height: innerHeight,
+                    method: "default"
+                });
+
+                this.renditon.display().then(() => {
+                    this.initTheme();
+                    this.initFontFamily();
+                    this.initFontSize();
+                    this.initGlobalStyle(getTheme(this.fileName));
+                });
+
+                this.renditon.hooks.content.register(contents => {
+                    Promise.all([
+                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
+                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
+                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`),
+                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`)
+                    ]).then(() => {
+                        // console.log('字体加载完毕')
+                    })
+                })
+            },
+            initGesture() {
+                this.renditon.on("touchstart", event => {
+                    this.touchStartX = event.changedTouches[0].clientX;
+                    this.touchStartTime = event.timeStamp;
+                });
+                this.renditon.on("touchend", event => {
+                    const offsetX = event.changedTouches[0].clientX - this.touchStartX;
+                    const time = event.timeStamp - this.touchStartTime;
+                    // console.log(offsetX, time)
+                    if (time < 500 && offsetX > 40) {
+                        this.prevPage();
+                    } else if (time < 500 && offsetX < -40) {
+                        this.nextPage();
+                    } else {
+                        this.toggleTitleAndMenu();
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+            },
             initFontFamily() {
                 let cachedFontFamily = getFontFamily(this.fileName);
                 if (!cachedFontFamily) {
@@ -77,7 +122,7 @@
             },
             initTheme() {
                 this.themeList.forEach(theme => {
-                    this.renditon.themes.register(theme.name, theme.style)
+                    this.book.rendition.themes.register(theme.name, theme.style)
                 });
                 let cachedTheme = getTheme(this.fileName);
                 if (!cachedTheme) {
@@ -89,50 +134,16 @@
             },
             initEpub() {
                 const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + ".epub";
-                //   console.log(url);
                 this.book = new Epub(url);
                 this.setCurrentBook(this.book);
-                this.renditon = this.book.renderTo("read", {
-                    width: innerWidth,
-                    height: innerHeight,
-                    method: "default"
-                });
 
-                this.renditon.display().then(() => {
-                    this.initTheme();
-                    this.initFontFamily();
-                    this.initFontSize();
-                    this.initGlobalStyle(getTheme(this.fileName));
-                });
-
-                this.renditon.on("touchstart", event => {
-                    this.touchStartX = event.changedTouches[0].clientX;
-                    this.touchStartTime = event.timeStamp;
-                });
-                this.renditon.on("touchend", event => {
-                    const offsetX = event.changedTouches[0].clientX - this.touchStartX;
-                    const time = event.timeStamp - this.touchStartTime;
-                    // console.log(offsetX, time)
-                    if (time < 500 && offsetX > 40) {
-                        this.prevPage();
-                    } else if (time < 500 && offsetX < -40) {
-                        this.nextPage();
-                    } else {
-                        this.toggleTitleAndMenu();
-                    }
-                    event.preventDefault();
-                    event.stopPropagation();
-                });
-
-                this.renditon.hooks.content.register(contents => {
-                    Promise.all([
-                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`),
-                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/cabin.css`),
-                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/tangerine.css`),
-                        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/montserrat.css`)
-                    ]).then(() => {
-                        // console.log('字体加载完毕')
-                    })
+                this.initRendition();
+                this.initGesture();
+                this.book.ready.then(() => {
+                    return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
+                }).then(locations => {
+                    // console.log(locations)
+                    this.setBookAvailable(true)
                 })
             }
         }

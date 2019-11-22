@@ -19,21 +19,24 @@
     <ebook-setting-font></ebook-setting-font>
     <ebook-setting-font-popup></ebook-setting-font-popup>
     <ebook-setting-theme></ebook-setting-theme>
+    <ebook-setting-progress></ebook-setting-progress>
   </div>
 </template>
 
 <script>
-    import {ebookMixin} from "../../utils/mixin"
-    import EbookSettingFont from "./EbookSettingFont"
-    import EbookSettingFontPopup from "./EbookSettingFontPopup"
-    import EbookSettingTheme from "./EbookSettingTheme"
+    import {ebookMixin} from "../../utils/mixin";
+    import EbookSettingFont from "./EbookSettingFont";
+    import EbookSettingFontPopup from "./EbookSettingFontPopup";
+    import EbookSettingTheme from "./EbookSettingTheme";
+    import EbookSettingProgress from "./EbookSettingProgress";
 
     export default {
         mixins: [ebookMixin],
         components: {
             EbookSettingTheme,
             EbookSettingFont,
-            EbookSettingFontPopup
+            EbookSettingFontPopup,
+            EbookSettingProgress
         },
         methods: {
             showSetting(key) {

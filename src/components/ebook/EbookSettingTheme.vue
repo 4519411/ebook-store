@@ -5,7 +5,7 @@
         <div class="setting-theme-item" v-for="(item, index) in themeList" :key="index" @click="setTheme(index)">
           <div class="preview" :class="{'selected': item.name === defaultTheme}"
                :style="{background: item.style.body.background}"></div>
-          <div class="text" :class="{'selected': item.name === defaultTheme}">{{item.alias}}</div>
+          <div class="text" :class="{'selected': item.name === defaultTheme}">{{ item.alias }}</div>
         </div>
       </div>
     </div>
@@ -19,7 +19,8 @@
     export default {
         mixins: [ebookMixin],
         mounted() {
-          this.setDefaultTheme(getTheme(this.fileName))
+            let theme = getTheme(this.fileName);
+            this.setDefaultTheme(theme)
         },
         methods: {
             setTheme(index) {
@@ -47,28 +48,34 @@
     height: px2rem(90);
     background: white;
     box-shadow: 0 px2rem(-8) px2rem(8) rgba(0, 0, 0, .15);
+
     .setting-theme {
       height: 100%;
       display: flex;
+
       .setting-theme-item {
         flex: 1;
         display: flex;
         flex-direction: column;
         padding: px2rem(5);
         box-sizing: border-box;
+
         .preview {
           flex: 1;
           border: px2rem(1) solid #ccc;
           box-sizing: border-box;
+
           &.selected {
             box-shadow: 0 px2rem(4) px2rem(6) 0 rgba(0, 0, 0, .1);
           }
         }
+
         .text {
           flex: 0 0 px2rem(20);
           font-size: px2rem(14);
           color: #ccc;
           @include center;
+
           &.selected {
             color: #333;
           }
