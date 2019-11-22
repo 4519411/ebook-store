@@ -14,7 +14,8 @@
         saveFontSize,
         getFontSize,
         getTheme,
-        saveTheme
+        saveTheme,
+        getLocation
     } from "../../utils/localStorage"
 
     global.ePub = Epub;
@@ -35,13 +36,17 @@
         methods: {
             prevPage() {
                 if (this.renditon) {
-                    this.renditon.prev();
+                    this.renditon.prev().then(() => {
+                        this.refreshLocations();
+                    });
                     this.hideTitleAndMenu();
                 }
             },
             nextPage() {
                 if (this.renditon) {
-                    this.renditon.next();
+                    this.renditon.next().then(() => {
+                        this.refreshLocations();
+                    });
                     this.hideTitleAndMenu();
                 }
             },
@@ -63,8 +68,8 @@
                     height: innerHeight,
                     method: "default"
                 });
-
-                this.renditon.display().then(() => {
+                let cachedLocation = getLocation(this.fileName);
+                this.display(cachedLocation, () => {
                     this.initTheme();
                     this.initFontFamily();
                     this.initFontSize();
@@ -143,7 +148,8 @@
                     return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
                 }).then(locations => {
                     // console.log(locations)
-                    this.setBookAvailable(true)
+                    this.setBookAvailable(true);
+                    this.refreshLocations();
                 })
             }
         }

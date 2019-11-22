@@ -24,8 +24,8 @@
           </div>
         </div>
         <div class="text-wrapper">
-          <span class="progress-section-text"></span>
-          <span>{{ bookAvailable ? progress + '%' : '加载中...' }}</span>
+          <span class="progress-section-text">{{ getSectionName }}</span>
+          <span>({{ bookAvailable ? progress + '%' : '加载中...' }})</span>
         </div>
       </div>
     </div>
@@ -37,29 +37,56 @@
 
     export default {
         mixins: [ebookMixin],
+        computed: {
+            getSectionName() {
+                if (this.section) {
+                    let thisSection = this.currentBook.section(this.section);
+                    if (thisSection && thisSection.href) {
+                        // let currentNavigationName = this.currentBook.navigation.get(thisSection.href).label;
+                        // currentNavigationName = currentNavigationName.length > 30 ? currentNavigationName.slice(0, 30) + "..." : currentNavigationName;
+                        // 使用CSS进行控制
+                        return this.currentBook.navigation.get(thisSection.href).label;
+                    }
+                }
+            }
+        },
         methods: {
             prevSection() {
-
+                if (this.section > 0 && this.bookAvailable) {
+                    this.setSection(this.section - 1).then(() => {
+                        this.displaySection();
+                    })
+                }
             },
             nextSection() {
-
+                if (this.section < this.currentBook.spine.length - 1 && this.bookAvailable) {
+                    this.setSection(this.section + 1).then(() => {
+                        this.displaySection();
+                    })
+                }
+            },
+            displaySection() {
+                let thisSection = this.currentBook.section(this.section);
+                if (thisSection && thisSection.href) {
+                    this.display(thisSection.href);
+                }
             },
             onProgressChange(progress) {
                 this.setProgress(progress).then(() => {
-                    this.displayProgress()
+                    this.displayProgress();
                 })
             },
             onProgressInput(progress) {
                 this.setProgress(progress).then(() => {
-                    this.displayProgress()
+                    this.displayProgress();
                 })
             },
             displayProgress() {
                 const cfi = this.currentBook.locations.cfiFromPercentage(this.progress / 100);
-                this.currentBook.rendition.display(cfi)
+                this.display(cfi);
             },
             updateProgressBg() {
-                this.$refs.progress.style.backgroundSize = `${this.progress}% 100%`
+                this.$refs.progress.style.backgroundSize = `${this.progress}% 100%`;
             }
         },
         updated() {

@@ -1,5 +1,6 @@
-import {mapGetters, mapActions} from 'vuex'
-import {themeList, addCSS, removeCSSAll} from "./book"
+import {mapGetters, mapActions} from 'vuex';
+import {themeList, addCSS, removeCSSAll} from "./book";
+import {saveLocation} from "./localStorage";
 
 export const ebookMixin = {
   computed: {
@@ -54,6 +55,32 @@ export const ebookMixin = {
       removeCSSAll();
       const href = `${process.env.VUE_APP_RES_URL}/theme/theme_` + theme.toLowerCase() + ".css";
       addCSS(href)
+    },
+    refreshLocations() {
+      let currentLocation = this.currentBook.rendition.currentLocation();
+      let startCfi = currentLocation.start.cfi;
+      let startProgress = this.currentBook.locations.percentageFromCfi(startCfi);
+      // console.log(startProgress, currentLocation, startCfi);
+      this.setProgress(Math.floor(startProgress * 100));
+      this.setSection(currentLocation.start.index);
+      saveLocation(this.fileName, startCfi);
+    },
+    display(target, cb) {
+      if (target) {
+        this.currentBook.rendition.display(target).then(() => {
+          this.refreshLocations();
+          if (cb) {
+            cb();
+          }
+        })
+      } else {
+        this.currentBook.rendition.display().then(() => {
+          this.refreshLocations();
+          if (cb) {
+            cb();
+          }
+        })
+      }
     }
   }
 };
