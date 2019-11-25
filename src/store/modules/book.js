@@ -8,7 +8,7 @@ const book = {
         fontFamilyVisible: false,
         defaultTheme: 'Default',
         bookAvailable: false,
-        progress: 0,
+        progress: null,
         section: 0,
         isPaginating: true,
         currentBook: null,
