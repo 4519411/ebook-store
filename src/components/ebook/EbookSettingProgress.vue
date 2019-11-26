@@ -34,21 +34,21 @@
 
 <script>
     import {ebookMixin} from "../../utils/mixin";
-    import {getReadTime} from "../../utils/localStorage";
 
     export default {
         mixins: [ebookMixin],
         computed: {
             getSectionName() {
-                if (this.section) {
-                    let thisSection = this.currentBook.section(this.section);
-                    if (thisSection && thisSection.href) {
-                        // let currentNavigationName = this.currentBook.navigation.get(thisSection.href).label;
-                        // currentNavigationName = currentNavigationName.length > 30 ? currentNavigationName.slice(0, 30) + "..." : currentNavigationName;
-                        // 使用CSS进行控制
-                        return this.currentBook.navigation.get(thisSection.href).label;
-                    }
-                }
+                // if (this.section) {
+                //     let thisSection = this.currentBook.section(this.section);
+                //     if (thisSection && thisSection.href && this.currentBook && this.currentBook.navigation) {
+                //         // let currentNavigationName = this.currentBook.navigation.get(thisSection.href).label;
+                //         // currentNavigationName = currentNavigationName.length > 30 ? currentNavigationName.slice(0, 30) + "..." : currentNavigationName;
+                //         // 使用CSS进行控制
+                //         return this.currentBook.navigation.get(thisSection.href).label;
+                //     }
+                // }
+                return this.section ? this.navigation[this.section].label : '';
             }
         },
         methods: {
@@ -88,12 +88,6 @@
             },
             updateProgressBg() {
                 this.$refs.progress.style.backgroundSize = `${this.progress}% 100%`;
-            },
-            getReadTimeText() {
-                return this.$t('book.haveRead').replace('$1', this.getReadTimeByMinute());
-            },
-            getReadTimeByMinute() {
-                return getReadTime(this.fileName) / 60;
             }
         },
         updated() {

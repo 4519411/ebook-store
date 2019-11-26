@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    import {FONT_SIZE_LIST} from "../../utils/book";
+    import {flatten, FONT_SIZE_LIST} from "../../utils/book";
     import {ebookMixin} from "../../utils/mixin";
     import Epub from "epubjs";
     import {
@@ -56,11 +56,6 @@
                     this.setSettingVisible(-1);
                 }
                 this.setMenuVisible(!this.menuVisible);
-            },
-            hideTitleAndMenu() {
-                // this.$store.dispatch('setMenuVisible', false)
-                this.setMenuVisible(false);
-                this.setSettingVisible(-1);
             },
             initRendition() {
                 this.renditon = this.book.renderTo("read", {
@@ -133,9 +128,39 @@
                 if (!cachedTheme) {
                     cachedTheme = this.themeList[0].name;
                     this.setDefaultTheme(cachedTheme);
-                    saveTheme(this.fileName, cachedTheme)
+                    saveTheme(this.fileName, cachedTheme);
                 }
-                this.book.rendition.themes.select(cachedTheme)
+                this.book.rendition.themes.select(cachedTheme);
+            },
+            setAndCheckMetadata() {
+                if (!this.metadata) {
+                    this.book.loaded.metadata.then(metadata => {
+                        this.setMetadata(metadata);
+                    });
+                    this.setAndCheckMetadata();
+                }
+            },
+            parseBook() {
+                this.book.loaded.cover.then(cover => {
+                    this.book.archive.createUrl(cover).then(url => {
+                        this.setCover(url);
+                    })
+                });
+                this.book.loaded.metadata.then(metadata => {
+                    this.setMetadata(metadata);
+                });
+                this.book.loaded.navigation.then(nav => {
+                    const navItem = flatten(nav.toc);
+
+                    function find(item, level = 0) {
+                        return !item.parent ? level : find(navItem.filter(parentItem => parentItem.id === item.parent)[0], ++level);
+                    }
+
+                    navItem.forEach(item => {
+                        item.level = find(item);
+                    });
+                    this.setNavigation(navItem);
+                })
             },
             initEpub() {
                 const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + ".epub";
@@ -144,10 +169,10 @@
 
                 this.initRendition();
                 this.initGesture();
+                this.parseBook();
                 this.book.ready.then(() => {
                     return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
                 }).then(locations => {
-                    // console.log(locations)
                     this.setBookAvailable(true);
                     this.refreshLocations();
                 })

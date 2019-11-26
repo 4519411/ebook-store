@@ -1,3 +1,5 @@
+import {getReadTime} from "./localStorage";
+
 export const FONT_SIZE_LIST = [
   {fontSize: 12},
   {fontSize: 14},
@@ -90,4 +92,17 @@ export function removeCSSAll() {
       }
     }
   }
+}
+
+export function getReadTimeByMinute(fileName) {
+  let readTime = getReadTime(fileName);
+  if (readTime) {
+    return getReadTime(fileName) / 60;
+  } else {
+    return 0;
+  }
+}
+
+export function flatten(array) {
+  return [].concat(...array.map(item => [].concat(item, ...flatten(item.subitems))))
 }
