@@ -16,7 +16,7 @@
         getTheme,
         saveTheme,
         getLocation
-    } from "../../utils/localStorage"
+    } from "../../utils/localStorage";
 
     global.ePub = Epub;
     export default {
@@ -131,14 +131,6 @@
                     saveTheme(this.fileName, cachedTheme);
                 }
                 this.book.rendition.themes.select(cachedTheme);
-            },
-            setAndCheckMetadata() {
-                if (!this.metadata) {
-                    this.book.loaded.metadata.then(metadata => {
-                        this.setMetadata(metadata);
-                    });
-                    this.setAndCheckMetadata();
-                }
             },
             parseBook() {
                 this.book.loaded.cover.then(cover => {

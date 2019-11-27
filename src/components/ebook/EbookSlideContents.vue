@@ -61,17 +61,14 @@
 </template>
 
 <script>
-    import {ebookMixin} from '../../utils/mixin'
-    import Scroll from '../common/Scroll'
-    import {px2rem} from '../../utils/utils'
+    import {ebookMixin} from "../../utils/mixin";
+    import Scroll from "../common/Scroll";
+    import {px2rem} from "../../utils/utils";
 
     export default {
         mixins: [ebookMixin],
         components: {
             Scroll
-        },
-        mounted() {
-          console.log(this.metadata);
         },
         data() {
             return {
